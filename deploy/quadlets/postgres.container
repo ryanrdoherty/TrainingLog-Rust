@@ -1,0 +1,27 @@
+[Unit]
+Description=Sports Log PostgreSQL
+After=network-online.target
+
+[Container]
+Image=docker.io/postgres:16-alpine
+ContainerName=postgres
+
+# Persistent data volume
+Volume=postgres-data:/var/lib/postgresql/data:Z
+
+# Credentials — set these in /etc/sports-log/db.env
+EnvironmentFile=/etc/sports-log/db.env
+
+Network=sports-log-net.network
+
+HealthCmd=pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}
+HealthInterval=10s
+HealthTimeout=5s
+HealthRetries=5
+
+[Service]
+Restart=always
+TimeoutStartSec=120
+
+[Install]
+WantedBy=multi-user.target default.target

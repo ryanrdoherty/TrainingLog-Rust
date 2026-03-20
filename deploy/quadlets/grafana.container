@@ -1,0 +1,31 @@
+[Unit]
+Description=Grafana
+After=prometheus.service
+Requires=prometheus.service
+
+[Container]
+Image=docker.io/grafana/grafana:latest
+ContainerName=grafana
+
+# Provisioning configs (datasource + dashboard locations)
+Volume=/etc/sports-log/grafana/provisioning:/etc/grafana/provisioning:ro,Z
+
+# Dashboard JSON files
+Volume=/etc/sports-log/grafana/dashboards:/var/lib/grafana/dashboards:ro,Z
+
+# Persistent Grafana state (user accounts, saved panels, etc.)
+Volume=grafana-data:/var/lib/grafana:Z
+
+PublishPort=3001:3000
+
+Environment=GF_SECURITY_ADMIN_PASSWORD__FILE=/run/secrets/grafana_admin_password
+Environment=GF_USERS_ALLOW_SIGN_UP=false
+Environment=GF_AUTH_ANONYMOUS_ENABLED=false
+
+Network=sports-log-net.network
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

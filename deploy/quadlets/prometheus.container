@@ -1,0 +1,24 @@
+[Unit]
+Description=Prometheus
+After=sports-log.service
+Requires=sports-log.service
+
+[Container]
+Image=docker.io/prom/prometheus:latest
+ContainerName=prometheus
+
+# Mount prometheus config (read-only)
+Volume=/etc/sports-log/prometheus.yml:/etc/prometheus/prometheus.yml:ro,Z
+
+# Persistent storage for metrics data
+Volume=prometheus-data:/prometheus:Z
+
+PublishPort=9090:9090
+
+Network=sports-log-net.network
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target
