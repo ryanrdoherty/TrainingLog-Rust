@@ -24,17 +24,17 @@ The system is a single Rust binary that exposes a JSON REST API on port 3000. In
 
 ```
                          ┌─────────────────────────────────────┐
-                         │          sports-log-net (bridge)     │
-                         │                                      │
+                         │          sports-log-net (bridge)    │
+                         │                                     │
   client ──:3000──► ┌────┴─────────┐     ┌──────────────────┐  │
-                    │  sports-log  │────►│   postgres:5432   │  │
+                    │  sports-log  │────►│   postgres:5432  │  │
                     │  (Rust/Axum) │     └──────────────────┘  │
-                    └────┬─────────┘                            │
-                         │  GET /metrics                        │
+                    └────┬─────────┘                           │
+                         │  GET /metrics                       │
                     ┌────▼─────────┐     ┌──────────────────┐  │
-  :9090 ◄────────── │  prometheus  │     │     grafana       │◄─┘
+  :9090 ◄────────── │  prometheus  │     │     grafana      │◄─┘
                     └──────────────┘     └──────────────────┘
-                                              :3001 ◄─── browser
+                                          :3001 ◄─── browser
 ```
 
 All containers share a Podman bridge network named `sports-log-net`. The app container connects to Postgres by hostname. Prometheus scrapes `sports-log:3000/metrics` every 15 seconds. Grafana reads from Prometheus and serves dashboards on port 3001.

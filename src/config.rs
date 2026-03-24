@@ -14,15 +14,15 @@ pub struct Config {
 
     pub app_base_url: String,
 
-    pub smtp_host: String,
+    pub smtp_host: Option<String>,
     pub smtp_port: u16,
-    pub smtp_user: String,
-    pub smtp_pass: String,
-    pub smtp_from: String,
+    pub smtp_user: Option<String>,
+    pub smtp_pass: Option<String>,
+    pub smtp_from: Option<String>,
 
-    pub twilio_account_sid: String,
-    pub twilio_auth_token: String,
-    pub twilio_from_number: String,
+    pub twilio_account_sid: Option<String>,
+    pub twilio_auth_token: Option<String>,
+    pub twilio_from_number: Option<String>,
 }
 
 impl Config {
@@ -43,22 +43,26 @@ impl Config {
 
             app_base_url: required("APP_BASE_URL")?,
 
-            smtp_host: required("SMTP_HOST")?,
+            smtp_host: optional("SMTP_HOST"),
             smtp_port: std::env::var("SMTP_PORT")
                 .unwrap_or_else(|_| "587".into())
                 .parse()
                 .context("SMTP_PORT must be an integer")?,
-            smtp_user: required("SMTP_USER")?,
-            smtp_pass: required("SMTP_PASS")?,
-            smtp_from: required("SMTP_FROM")?,
+            smtp_user: optional("SMTP_USER"),
+            smtp_pass: optional("SMTP_PASS"),
+            smtp_from: optional("SMTP_FROM"),
 
-            twilio_account_sid: required("TWILIO_ACCOUNT_SID")?,
-            twilio_auth_token: required("TWILIO_AUTH_TOKEN")?,
-            twilio_from_number: required("TWILIO_FROM_NUMBER")?,
+            twilio_account_sid: optional("TWILIO_ACCOUNT_SID"),
+            twilio_auth_token: optional("TWILIO_AUTH_TOKEN"),
+            twilio_from_number: optional("TWILIO_FROM_NUMBER"),
         })
     }
 }
 
 fn required(key: &str) -> Result<String> {
     std::env::var(key).with_context(|| format!("Missing required env var: {key}"))
+}
+
+fn optional(key: &str) -> Option<String> {
+    std::env::var(key).ok()
 }

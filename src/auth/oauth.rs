@@ -9,7 +9,6 @@ use metrics::counter;
 use axum::{
     extract::{Path, Query, State},
     response::Redirect,
-    Json,
 };
 use oauth2::{
     basic::BasicClient, AuthUrl, ClientId, ClientSecret, CsrfToken, RedirectUrl, Scope, TokenUrl,
@@ -96,7 +95,7 @@ pub async fn callback(
     Path(provider): Path<String>,
     Query(params): Query<CallbackQuery>,
     State((pool, config)): State<(PgPool, Config)>,
-) -> Result<Json<AuthResponse>, AppError> {
+) -> Result<axum::response::Redirect, AppError> {
     let http = HttpClient::new();
 
     // Exchange authorization code for access token using reqwest directly
@@ -155,7 +154,8 @@ pub async fn callback(
 
     let token = jwt::issue_token(user.id, &user.email, user.token_version, &config)?;
     counter!("sports_log_logins_total", "method" => provider.clone(), "status" => "success").increment(1);
-    Ok(Json(AuthResponse { token }))
+    let redirect_url = format!("{}/auth/callback?token={}", config.app_base_url, token);
+    Ok(axum::response::Redirect::to(&redirect_url))
 }
 
 #[derive(Deserialize)]

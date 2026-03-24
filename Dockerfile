@@ -1,5 +1,5 @@
 # ── Stage 1: Build ────────────────────────────────────────────────────────────
-FROM rust:1.86-slim-bookworm AS builder
+FROM rust:1.94-slim-bookworm AS builder
 
 # System deps needed for sqlx, openssl, etc.
 RUN apt-get update && apt-get install -y \
